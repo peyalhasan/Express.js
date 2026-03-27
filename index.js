@@ -42,6 +42,37 @@ app.post('/api/users', (req, res) => {
     res.status(201).json({message: "User created", user: req.body})
 })
 
+// Route that may throw an error
+app.get('/error', (req, res) =>{
+    throw new Error('Something went wrong')
+})
+
+// Route that uses next(error) for asynchronous code 
+
+app.get('/async-error', (req, res, next)=>{
+
+    // Simulating an asynchronous operation that files 
+
+    setTimeout(()=>{
+        try{
+
+            // Something that might fail
+            const result = nonExistentFunction(); // This will throw an error;
+            res. send(result);
+        }catch(error){
+            next(error)
+        }
+    }, 5000)
+})
+
+
+// Custom error handling middleware 
+// Must have four paramenters to be recognized as an error handler 
+
+app.use((err, req, res, next) =>{
+    console.error(err.stack);
+    res.status(500).send('Something broke!')
+})
 
 app.listen(port, () => {
     console.log(`Example app listening at localhost:${port}`)
